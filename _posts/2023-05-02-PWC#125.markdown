@@ -1,0 +1,80 @@
+---
+layout: post
+title:  "PWC #125"
+date:   2023-05-02 22:16:23 +0800
+categories: jekyll update
+---
+# [Task 1: Odd One Out][task1-ref]
+
+You are given a list of words (alphabetic characters only) of same size.
+
+Write a script to remove all words not sorted alphabetically and print the number of words in the list that are not alphabetically sorted.
+
+## [source code][task1-src]
+```
+unit sub MAIN(*@S);
+
+put +@S.grep({ ![lt] .comb });
+```
+
+## example 1
+
+**input**: `@words = ('abc', 'xyz', 'tsu')`
+
+`'abc'.comb` splits the string into a list of characters: ('a', 'b', 'c').
+
+`[lt] ('a', 'b', 'c')` checks whether the list of characters are alphabatically sorted.
+
+`!([lt] ('a', 'b', 'c'))` checks whether the list of characters are **not** alphabatically sorted.
+
+`@S.grep({ ![lt] .comb })` finds all those input strings that are not alphabatically sorted.
+
+Add a '+' before the list gives the number of elements of that list.
+
+## [test][tests-ref]
+
+```
+$ ./ch-1.raku abc xyz tsu
+1
+```
+
+# [Task 2: Number Placement][task2-ref]
+
+You are given a list of numbers having just 0 and 1. You are also given placement count (>=1).
+
+Write a script to find out if it is possible to replace 0 with 1 in the given list. The only condition is that you can only replace when there is no 1 on either side. Print 1 if it is possible otherwise 0.
+
+## [source code][task2-src]
+```
+unit sub MAIN(*@numbers where @numbers.head(*-1).all == 0|1);
+
+@numbers .= map: *.Int;
+my $count = @numbers.pop;
+
+put +((^(+@numbers - 2)).grep({ @numbers[$_..$_+2].all == 0 }) ≥ $count);
+```
+
+## example 1
+
+**input**: `@numbers = (1,0,0,0,1), $count = 1`
+
+`^(+@numbers - 2)` gives indexes of numbers from 0 to length of numbers minus 3: 0 .. 2.
+
+`(^(+@numbers - 2)).grep({ @numbers[$_..$_+2].all == 0 })` finds all slices of the numbers list which contains 3 consecutive zeros.
+
+Compares the number of slices with count gives the boolean result: True.
+
+Add a '+' sign before the boolean value translates the boolean value into 1.
+
+## [test][tests-ref]
+
+```
+$ ./ch-2.raku 1 0 0 0 1  1
+1
+```
+
+[task1-ref]: https://theweeklychallenge.org/blog/perl-weekly-challenge-215/#TASK1
+[task2-ref]: https://theweeklychallenge.org/blog/perl-weekly-challenge-215/#TASK2
+[task1-src]: https://github.com/seaker/perlweeklychallenge-club/blob/master/challenge-215/feng-chang/raku/ch-1.raku
+[task2-src]: https://github.com/seaker/perlweeklychallenge-club/blob/master/challenge-215/feng-chang/raku/ch-2.raku
+[tests-ref]: https://github.com/seaker/perlweeklychallenge-club/blob/master/challenge-215/feng-chang/raku/test.raku
