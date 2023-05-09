@@ -124,7 +124,7 @@ if %word-bag.Set (-) ([(|)] %bags.values».Set) {
 &ensp;&ensp;&ensp; Keep only those stickers that are useful. If `%bags{$_} (&) %word-bag` is empty, the sticker has
 nothing in common with the target, and is dropped.
 
-- For the endless `loop`, we use `@A` array to keep the intermediate states of all possible answers between each round,
+- For the endless `loop`, we use `@A` array to keep the intermediate states of all possible answers for each round,
 `@A_` as cache.
 
 &ensp;&ensp;&ensp; A state is consisted of 3 elements: the remaining of the target bag, remaining useful stickers, history, i.e. the used words.
