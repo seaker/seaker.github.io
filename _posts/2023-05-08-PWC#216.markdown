@@ -1,0 +1,147 @@
+---
+layout: post
+title:  "PWC #216"
+date:   2023-05-08 19:36:28 +0800
+categories: jekyll update
+---
+# [Task 1: Registration Number][task1-ref]
+
+You are given a list of words and a random registration number.
+
+Write a script to find all the words in the given list that has every letter in the given registration number.
+
+## [source code][task1-src]
+```
+unit sub MAIN(*@words);
+
+my $regs = @words.pop.lc.comb.grep(/<[a..z]>/).Set;
+put @words.grep({ .comb.Set (>=) $regs }).map({ "'$_'" }).join(', ');
+```
+
+## example 1
+
+**input**: `@words = ('abc', 'abcd', 'bcd'), $reg = 'AB1 2CD'`
+
+`@words.pop` gets the registration number `'AB1 2CD'` as the last word from command line parameters.
+
+`.lc` converts all upper case characters into lower cases, now we get `'ab1 2cd'`.
+
+While `.comb` splits the registration number into a character list: `('a', 'b', '1', '2', 'c', 'd')`.
+
+`.grep(/<[a..z]>/)` filters the character list, keeping only alphabetic characters: `('a', 'b', 'c', 'd')`.
+
+`.Set` converts the list into a character set: `['a', 'b', 'c', 'd']`.
+
+`.grep({ .comb.Set (>=) $regs })` filters all the words, keeping those can cover every letter in the registration number, and finally, we reach the answer.
+
+## [test][tests-ref]
+
+```
+$ ./ch-1.raku abc abcd bcd   'AB1 2CD'
+'abcd'
+```
+
+# [Task 2: Word Stickers][task2-ref]
+
+You are given a list of word stickers and a target word.
+
+Write a script to find out how many word stickers is needed to make up the given target word.
+
+## [source code][task2-src]
+```
+unit sub MAIN(*@stickers);
+
+my %word-bag = @stickers.pop.comb.Bag;
+my %bags = @stickers.map({ $_ => .comb.Bag });
+
+if %word-bag.Set (-) ([(|)] %bags.values».Set) {
+    put 0;
+    exit;
+}
+
+my @A = [%word-bag, @stickers.grep({ %bags{$_} (&) %word-bag }), []],;
+
+loop {
+    my @A_;
+
+    for @A -> (%word-bag, @stickers, @history) {
+        for @stickers -> $s {
+            my %word-bag_ = %word-bag (-) %bags{$s};
+            my @history_ = |@history, $s;
+
+            if +%word-bag_ == 0 {
+                put +@history_;
+                exit 0;
+            } else {
+                @A_.push([%word-bag_, @stickers.grep({ %bags{$_} (&) %word-bag_ }), @history_]);
+            }
+        }
+    }
+
+    @A = @A_;
+}
+```
+
+## example 1
+
+**input**: `@stickers = ('perl','raku','python'), $word = 'peon'`
+
+- `my %word-bag = @stickers.pop.comb.Bag`
+
+&ensp;&ensp;&ensp; %word-bag keeps track of each character and its count in the target word:
+
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp; `{:p(1), :e(1), :o(1), :n(1)}`
+
+- `my %bags = @stickers.map({ $_ => .comb.Bag })`
+
+&ensp;&ensp;&ensp; %bags is a hash mapping each sticker and its character bag:
+
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp; `{:perl({"l"=>1,"r"=>1,"e"=>1,"p"=>1}),`
+
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp; `:python({"o"=>1,"t"=>1,"p"=>1,"n"=>1,"y"=>1,"h"=>1}),`
+
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp; `:raku({"u"=>1,"a"=>1,"r"=>1,"k"=>1})}`
+
+- ```
+if %word-bag.Set (-) ([(|)] %bags.values».Set) {
+    put 0;
+    exit;
+}
+```
+
+&ensp;&ensp;&ensp; If the stickers cannot cover the target word, we print zero and exit early.
+
+&ensp;&ensp;&ensp; Here, `(-)` is the set difference oparator, `(|)` is the set union operator, `»` is short cut for map().
+
+&ensp;&ensp;&ensp; Because numbers of the characters are not important here, so we convert bags into sets.
+
+&ensp;&ensp;&ensp; `[(|)] %bags.values».Set` unites all sets of the words. If the union cannot cover the target set, it will fail eventually.
+
+&ensp;&ensp;&ensp; Sure we can deal with the failure later, but that will neither make the code shorter, nor the the logic simpler.
+
+- `@stickers.grep({ %bags{$_} (&) %word-bag })`
+
+&ensp;&ensp;&ensp; Keep only those stickers that are useful. If `%bags{$_} (&) %word-bag` is empty, the sticker has
+nothing in common with the target, and is dropped.
+
+- For the endless `loop`, we use `@A` array to keep the intermediate states of all possible answers for each round,
+`@A_` as cache.
+
+&ensp;&ensp;&ensp; A state is consisted of 3 elements: the remaining of the target bag, remaining useful stickers, history, i.e. the used words.
+
+- `+%word-bag_ == 0`
+
+&ensp;&ensp;&ensp; When the target bag becomes empty, it means an answer is found, we print the result and exit.
+
+## [test][tests-ref]
+
+```
+$ ./ch-2.raku perl raku python   peon
+2
+```
+
+[task1-ref]: https://theweeklychallenge.org/blog/perl-weekly-challenge-216/#TASK1
+[task2-ref]: https://theweeklychallenge.org/blog/perl-weekly-challenge-216/#TASK2
+[task1-src]: https://github.com/seaker/perlweeklychallenge-club/blob/master/challenge-216/feng-chang/raku/ch-1.raku
+[task2-src]: https://github.com/seaker/perlweeklychallenge-club/blob/master/challenge-216/feng-chang/raku/ch-2.raku
+[tests-ref]: https://github.com/seaker/perlweeklychallenge-club/blob/master/challenge-216/feng-chang/raku/test.raku
