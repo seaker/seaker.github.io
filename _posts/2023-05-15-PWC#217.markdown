@@ -1,0 +1,74 @@
+---
+layout: post
+title:  "PWC #217"
+date:   2023-05-15 20:19:53 +0800
+categories: jekyll update
+---
+
+# [Task 1: Sorted Matrix][task1-ref]
+
+You are given a n x n matrix where n >= 2.
+
+Write a script to find 3rd smallest element in the sorted matrix.
+
+## [source code][task1-src]
+```
+unit sub MAIN(Str:D $s);
+
+use MONKEY-SEE-NO-EVAL;
+
+put (EVAL $s)[*;*].sort[2];
+```
+
+## example 1
+
+**input**: `@matrix = ([3, 1, 2], [5, 2, 4], [0, 1, 3])`
+
+`EVAL $s` translates the input string into a real 2-demensional array: `[[3, 1, 2], [5, 2, 4], [0, 1, 3]]`.
+
+`[*;*]` flattens the 2-demensional array into 1-demensional: [3, 1, 2, 5, 2, 4, 0, 1, 3].
+
+`sort` sorts the array: `[0, 1, 1, 2, 2, 3, 3, 4, 5]`, then the 3rd member of the array: `1`, whose index is `2` is printed.
+
+## [test][tests-ref]
+
+```
+$ ./ch-1.raku '[3, 1, 2], [5, 2, 4], [0, 1, 3]'
+1
+```
+
+# [Task 2: Max Number][task2-ref]
+
+You are given a list of positive integers.
+
+Write a script to concatenate the integers to form the highest possible value.
+
+## [source code][task2-src]
+```
+unit sub MAIN(*@N);
+
+put @N.permutations».join.max;
+```
+
+## example 1
+
+**input**: `@list = (1, 23)`
+
+`@N.permutations` returns all permutations of the list: `(1, 23), (23, 1)`.
+
+`».join` maps each permutation into a concatenated number: `123, 231`.
+
+`.max` returns the maximum of all the concatenated numbers: `231`.
+
+## [test][tests-ref]
+
+```
+$ ./ch-2.raku 1 23
+231
+```
+
+[task1-ref]: https://theweeklychallenge.org/blog/perl-weekly-challenge-217/#TASK1
+[task2-ref]: https://theweeklychallenge.org/blog/perl-weekly-challenge-217/#TASK2
+[task1-src]: https://github.com/seaker/perlweeklychallenge-club/blob/master/challenge-217/feng-chang/raku/ch-1.raku
+[task2-src]: https://github.com/seaker/perlweeklychallenge-club/blob/master/challenge-217/feng-chang/raku/ch-2.raku
+[tests-ref]: https://github.com/seaker/perlweeklychallenge-club/blob/master/challenge-217/feng-chang/raku/test.raku
